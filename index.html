@@ -23,35 +23,30 @@
       font-size: 16px;
     }
 
-    .category {
-      font-weight: bold;
-      cursor: pointer;
-      margin: 10px 0;
-      font-size: 18px;
+    .node {
+      margin-left: 15px;
     }
 
-    .subcategory {
+    .title {
+      cursor: pointer;
+      font-weight: bold;
+      margin: 6px 0;
+      padding: 4px;
+    }
+
+    .title:hover {
+      background: #f0f0f0;
+    }
+
+    .items a {
+      display: block;
       margin-left: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-
-    .items {
-      margin-left: 40px;
-      display: none;
-    }
-
-    .item {
-      margin: 5px 0;
-    }
-
-    a {
-      text-decoration: none;
       color: #1a73e8;
+      text-decoration: none;
+      margin-bottom: 4px;
     }
 
-    a:hover {
+    .items a:hover {
       text-decoration: underline;
     }
 
@@ -59,16 +54,16 @@
       font-size: 12px;
       background: #333;
       color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 2px 5px;
       margin-left: 5px;
+      border-radius: 4px;
     }
   </style>
 </head>
 
 <body>
 
-<h1>📚 资源树状导航系统</h1>
+<h1>📚 无限树状资源导航系统</h1>
 
 <input id="search" placeholder="搜索资源..." oninput="render()" />
 
@@ -211,77 +206,69 @@ const data = [
   }
 ];
 
-// 搜索关键词
-function getSearch() {
+// 获取搜索词
+function getKey() {
   return document.getElementById("search").value.toLowerCase();
 }
 
-// 渲染整个树
+// 🔥 核心递归渲染函数（无限树）
+function createNode(node) {
+  const container = document.createElement("div");
+  container.className = "node";
+
+  const title = document.createElement("div");
+  title.className = "title";
+  title.innerText = "📁 " + (node.category || node.subcategory || "节点");
+
+  const content = document.createElement("div");
+  content.style.display = "none";
+
+  title.onclick = () => {
+    content.style.display =
+      content.style.display === "none" ? "block" : "none";
+  };
+
+  const key = getKey();
+
+  // items
+  if (node.items) {
+    node.items
+      .filter(i =>
+        !key ||
+        i.name.toLowerCase().includes(key) ||
+        i.tags.join("").toLowerCase().includes(key)
+      )
+      .forEach(i => {
+        const a = document.createElement("a");
+        a.href = i.url;
+        a.target = "_blank";
+        a.innerHTML = i.name +
+          i.tags.map(t => `<span class="tag">${t}</span>`).join("");
+
+        content.appendChild(a);
+      });
+  }
+
+  // children（递归）
+  if (node.children) {
+    node.children.forEach(child => {
+      content.appendChild(createNode(child));
+    });
+  }
+
+  container.appendChild(title);
+  container.appendChild(content);
+
+  return container;
+}
+
+// 渲染
 function render() {
   const app = document.getElementById("app");
   app.innerHTML = "";
 
-  const key = getSearch();
-
-  data.forEach(cat => {
-    const catDiv = document.createElement("div");
-
-    const catTitle = document.createElement("div");
-    catTitle.className = "category";
-    catTitle.innerText = "📁 " + cat.category;
-
-    const catContent = document.createElement("div");
-    catContent.style.display = "none";
-
-    catTitle.onclick = () => {
-      catContent.style.display =
-        catContent.style.display === "none" ? "block" : "none";
-    };
-
-    cat.children.forEach(sub => {
-      const subDiv = document.createElement("div");
-
-      const subTitle = document.createElement("div");
-      subTitle.className = "subcategory";
-      subTitle.innerText = "📂 " + sub.subcategory;
-
-      const itemBox = document.createElement("div");
-      itemBox.className = "items";
-
-      subTitle.onclick = () => {
-        itemBox.style.display =
-          itemBox.style.display === "none" ? "block" : "none";
-      };
-
-      let items = sub.items || [];
-
-      if (key) {
-        items = items.filter(i =>
-          i.name.toLowerCase().includes(key) ||
-          i.tags.join("").toLowerCase().includes(key)
-        );
-      }
-
-      items.forEach(i => {
-        const item = document.createElement("div");
-        item.className = "item";
-
-        item.innerHTML = `
-          🔗 <a href="${i.url}" target="_blank">${i.name}</a>
-          ${i.tags.map(t => `<span class="tag">${t}</span>`).join("")}
-        `;
-
-        itemBox.appendChild(item);
-      });
-
-      subDiv.appendChild(subTitle);
-      subDiv.appendChild(itemBox);
-      catContent.appendChild(subDiv);
-    });
-
-    catDiv.appendChild(catTitle);
-    catDiv.appendChild(catContent);
-    app.appendChild(catDiv);
+  data.forEach(d => {
+    app.appendChild(createNode(d));
   });
 }
 
