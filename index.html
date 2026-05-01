@@ -189,12 +189,10 @@ function renderSidebar() {
     const item = document.createElement("div");
     item.innerText = d.category;
 
-    item.onclick = () => {
-      const app = document.getElementById("app");
-      app.innerHTML = "";
-      app.appendChild(createNode(d));
-    };
-
+   item.onclick = () => {
+  app.innerHTML = "";
+  render(); // 直接渲染整棵树
+};
     sb.appendChild(item);
   });
 }
