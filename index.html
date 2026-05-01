@@ -11,9 +11,9 @@ body {
   display: flex;
 }
 
-/* 左侧导航 */
+/* 左侧 */
 #sidebar {
-  width: 250px;
+  width: 260px;
   height: 100vh;
   overflow-y: auto;
   border-right: 1px solid #ddd;
@@ -29,32 +29,25 @@ body {
   background: #f0f0f0;
 }
 
-/* 主内容 */
+/* 主体 */
 #main {
   flex: 1;
   padding: 20px;
 }
 
-/* 标题 */
-h1 {
-  margin-top: 0;
-}
-
-/* 搜索 */
 input {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
 }
 
-/* 节点 */
+/* 树 */
 .node-title {
   cursor: pointer;
   font-weight: bold;
   margin: 6px 0;
 }
 
-/* 动画折叠 */
 .node-content {
   overflow: hidden;
   max-height: 0;
@@ -73,7 +66,7 @@ a {
 /* 收藏 */
 .star {
   cursor: pointer;
-  margin-left: 6px;
+  margin-right: 6px;
   color: gold;
 }
 
@@ -86,36 +79,26 @@ mark {
 
 <body>
 
-<!-- 左侧 -->
 <div id="sidebar"></div>
 
-<!-- 主内容 -->
 <div id="main">
-
-<h1>📚 这是一个历史学工具盒</h1>
-
-<input id="search" placeholder="搜索资源..." oninput="render()" />
-
-<div id="app"></div>
-
+  <h1>📚 历史学工具盒</h1>
+  <input id="search" placeholder="搜索资源..." oninput="render()" />
+  <div id="app"></div>
 </div>
 
 <script>
 
 let data = [];
-
-// ⭐ 收藏
 let favorites = JSON.parse(localStorage.getItem("fav") || "[]");
 
-// 获取搜索
 function getKey() {
   return document.getElementById("search").value.toLowerCase();
 }
 
-// 收藏
 function toggleFav(name, url) {
-  const index = favorites.findIndex(f => f.url === url);
-  if (index > -1) favorites.splice(index, 1);
+  const i = favorites.findIndex(f => f.url === url);
+  if (i > -1) favorites.splice(i, 1);
   else favorites.push({ name, url });
 
   localStorage.setItem("fav", JSON.stringify(favorites));
@@ -126,19 +109,18 @@ function isFav(url) {
   return favorites.some(f => f.url === url);
 }
 
-// 高亮
 function highlight(text, key) {
   if (!key) return text;
   return text.replaceAll(key, `<mark>${key}</mark>`);
 }
 
-// 🔥 递归树（唯一版本）
+/* 树结构 */
 function createNode(node) {
   const div = document.createElement("div");
 
   const title = document.createElement("div");
   title.className = "node-title";
-  title.innerText = "📁 " + (node.category || node.subcategory || "节点");
+  title.innerText = "📁 " + (node.category || node.subcategory);
 
   const content = document.createElement("div");
   content.className = "node-content";
@@ -150,7 +132,6 @@ function createNode(node) {
 
   const key = getKey();
 
-  // items
   if (node.items) {
     node.items.forEach(i => {
       if (key && !i.name.toLowerCase().includes(key)) return;
@@ -175,10 +156,9 @@ function createNode(node) {
     });
   }
 
-  // children（递归）
   if (node.children) {
-    node.children.forEach(child => {
-      content.appendChild(createNode(child));
+    node.children.forEach(c => {
+      content.appendChild(createNode(c));
     });
   }
 
@@ -188,16 +168,19 @@ function createNode(node) {
   return div;
 }
 
-// 渲染
+/* 渲染 */
 function render() {
   const app = document.getElementById("app");
+  app.innerHTML = "";
+
   if (!data.length) return;
 
-  app.innerHTML = "";
-  data.forEach(d => app.appendChild(createNode(d)));
+  data.forEach(d => {
+    app.appendChild(createNode(d));
+  });
 }
 
-// 左侧导航
+/* 左侧导航 */
 function renderSidebar() {
   const sb = document.getElementById("sidebar");
   sb.innerHTML = "<b>📂 导航</b>";
@@ -216,7 +199,7 @@ function renderSidebar() {
   });
 }
 
-// 🔥 数据加载（关键）
+/* 加载 JSON */
 fetch("./data.json")
   .then(res => {
     if (!res.ok) throw new Error("加载失败");
