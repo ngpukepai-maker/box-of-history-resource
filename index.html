@@ -11,7 +11,7 @@ body {
   display: flex;
 }
 
-/* 左侧 */
+/* 左侧导航 */
 #sidebar {
   width: 260px;
   height: 100vh;
@@ -41,7 +41,7 @@ input {
   margin-bottom: 15px;
 }
 
-/* 树 */
+/* 节点 */
 .node-title {
   cursor: pointer;
   font-weight: bold;
@@ -49,10 +49,8 @@ input {
 }
 
 .node-content {
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.3s ease;
   margin-left: 15px;
+  display: none;
 }
 
 /* 链接 */
@@ -83,7 +81,7 @@ mark {
 
 <div id="main">
   <h1>📚 历史学工具盒</h1>
-  <input id="search" placeholder="搜索资源..." oninput="render()" />
+  <input id="search" placeholder="搜索资源..." oninput="renderRoot()" />
   <div id="app"></div>
 </div>
 
@@ -92,29 +90,34 @@ mark {
 let data = [];
 let favorites = JSON.parse(localStorage.getItem("fav") || "[]");
 
+/* 获取搜索 */
 function getKey() {
   return document.getElementById("search").value.toLowerCase();
 }
 
+/* 收藏 */
 function toggleFav(name, url) {
   const i = favorites.findIndex(f => f.url === url);
   if (i > -1) favorites.splice(i, 1);
   else favorites.push({ name, url });
 
   localStorage.setItem("fav", JSON.stringify(favorites));
-  render();
+  renderRoot();
 }
 
 function isFav(url) {
   return favorites.some(f => f.url === url);
 }
 
+/* 高亮 */
 function highlight(text, key) {
   if (!key) return text;
   return text.replaceAll(key, `<mark>${key}</mark>`);
 }
 
-/* 树结构 */
+/* =========================
+   核心：递归树（稳定版）
+========================= */
 function createNode(node) {
   const div = document.createElement("div");
 
@@ -125,13 +128,15 @@ function createNode(node) {
   const content = document.createElement("div");
   content.className = "node-content";
 
+  /* 点击展开/收起 */
   title.onclick = () => {
-    content.style.maxHeight =
-      content.style.maxHeight ? null : content.scrollHeight + "px";
+    content.style.display =
+      content.style.display === "block" ? "none" : "block";
   };
 
   const key = getKey();
 
+  /* items */
   if (node.items) {
     node.items.forEach(i => {
       if (key && !i.name.toLowerCase().includes(key)) return;
@@ -156,9 +161,10 @@ function createNode(node) {
     });
   }
 
+  /* children（无限递归） */
   if (node.children) {
-    node.children.forEach(c => {
-      content.appendChild(createNode(c));
+    node.children.forEach(child => {
+      content.appendChild(createNode(child));
     });
   }
 
@@ -168,19 +174,23 @@ function createNode(node) {
   return div;
 }
 
-/* 渲染 */
-function render() {
+/* =========================
+   渲染当前视图（不会清空重绘全树）
+========================= */
+function renderRoot() {
   const app = document.getElementById("app");
   app.innerHTML = "";
 
-  if (!data.length) return;
+  const key = getKey();
 
   data.forEach(d => {
     app.appendChild(createNode(d));
   });
 }
 
-/* 左侧导航 */
+/* =========================
+   左侧导航（只切大类）
+========================= */
 function renderSidebar() {
   const sb = document.getElementById("sidebar");
   sb.innerHTML = "<b>📂 导航</b>";
@@ -189,24 +199,28 @@ function renderSidebar() {
     const item = document.createElement("div");
     item.innerText = d.category;
 
-   item.onclick = () => {
-  app.innerHTML = "";
-  render(); // 直接渲染整棵树
-};
+    item.onclick = () => {
+      const app = document.getElementById("app");
+      app.innerHTML = "";
+      app.appendChild(createNode(d));
+    };
+
     sb.appendChild(item);
   });
 }
 
-/* 加载 JSON */
+/* =========================
+   加载 JSON
+========================= */
 fetch("./data.json")
   .then(res => {
-    if (!res.ok) throw new Error("加载失败");
+    if (!res.ok) throw new Error("data.json加载失败");
     return res.json();
   })
   .then(json => {
     data = json;
     renderSidebar();
-    render();
+    renderRoot();
   })
   .catch(err => {
     console.error(err);
