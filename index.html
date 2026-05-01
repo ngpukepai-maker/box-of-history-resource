@@ -102,122 +102,17 @@ mark {
 
 <script>
 
-<script>
-
 let data = [];
 
-// 从 data.json 自动加载
-fetch("./data.json")
-  .then(res => {
-    if (!res.ok) {
-      throw new Error("data.json加载失败，状态码：" + res.status);
-    }
-    return res.json();
-  })
-  .then(json => {
-    console.log("数据加载成功", json);
-    data = json;
-    renderSidebar();
-    render();
-  })
-  .catch(err => {
-    console.error("加载错误：", err);
-    document.getElementById("app").innerHTML =
-      "<p style='color:red'>数据加载失败，请检查 data.json 路径</p>";
-  });
-
-// 搜索
-function getKey() {
-  return document.getElementById("search").value.toLowerCase();
-}
-
-// ⭐ 收藏（如果你之前有可以继续保留）
-let favorites = JSON.parse(localStorage.getItem("fav") || "[]");
-
-// 核心递归
-function createNode(node) {
-  const div = document.createElement("div");
-
-  const title = document.createElement("div");
-  title.innerText = "📁 " + (node.category || node.subcategory || "节点");
-  title.style.cursor = "pointer";
-  title.style.fontWeight = "bold";
-
-  const content = document.createElement("div");
-  content.style.display = "none";
-
-  title.onclick = () => {
-    content.style.display =
-      content.style.display === "none" ? "block" : "none";
-  };
-
-  // items
-  if (node.items) {
-    node.items.forEach(i => {
-      const a = document.createElement("a");
-      a.href = i.url;
-      a.target = "_blank";
-      a.innerText = i.name;
-      content.appendChild(a);
-    });
-  }
-
-  // children（递归）
-  if (node.children) {
-    node.children.forEach(child => {
-      content.appendChild(createNode(child));
-    });
-  }
-
-  div.appendChild(title);
-  div.appendChild(content);
-
-  return div;
-}
-
-// 渲染
-function render() {
-  const app = document.getElementById("app");
-  if (!data.length) return;
-
-  app.innerHTML = "";
-  data.forEach(d => {
-    app.appendChild(createNode(d));
-  });
-}
-
-// 左侧导航
-function renderSidebar() {
-  const sb = document.getElementById("sidebar");
-  if (!data.length) return;
-
-  sb.innerHTML = "<b>📂 导航</b>";
-
-  data.forEach(d => {
-    const item = document.createElement("div");
-    item.innerText = d.category;
-
-    item.onclick = () => {
-      const app = document.getElementById("app");
-      app.innerHTML = "";
-      app.appendChild(createNode(d));
-    };
-
-    sb.appendChild(item);
-  });
-}
-
-</script>
-
-// 收藏数据
-let favorites = JSON.parse(localStorage.getItem("fav") || "[]");
-
-// 搜索
-function getKey() {
-  return document.getElementById("search").value.toLowerCase();
-}
-
 // ⭐ 收藏
+let favorites = JSON.parse(localStorage.getItem("fav") || "[]");
+
+// 获取搜索
+function getKey() {
+  return document.getElementById("search").value.toLowerCase();
+}
+
+// 收藏
 function toggleFav(name, url) {
   const index = favorites.findIndex(f => f.url === url);
   if (index > -1) favorites.splice(index, 1);
@@ -227,18 +122,17 @@ function toggleFav(name, url) {
   render();
 }
 
-// ⭐ 是否收藏
 function isFav(url) {
   return favorites.some(f => f.url === url);
 }
 
-// 🔥 高亮
+// 高亮
 function highlight(text, key) {
   if (!key) return text;
   return text.replaceAll(key, `<mark>${key}</mark>`);
 }
 
-// 🔥 递归树
+// 🔥 递归树（唯一版本）
 function createNode(node) {
   const div = document.createElement("div");
 
@@ -250,11 +144,8 @@ function createNode(node) {
   content.className = "node-content";
 
   title.onclick = () => {
-    if (content.style.maxHeight) {
-      content.style.maxHeight = null;
-    } else {
-      content.style.maxHeight = content.scrollHeight + "px";
-    }
+    content.style.maxHeight =
+      content.style.maxHeight ? null : content.scrollHeight + "px";
   };
 
   const key = getKey();
@@ -262,10 +153,7 @@ function createNode(node) {
   // items
   if (node.items) {
     node.items.forEach(i => {
-
-      if (key &&
-        !i.name.toLowerCase().includes(key)
-      ) return;
+      if (key && !i.name.toLowerCase().includes(key)) return;
 
       const row = document.createElement("div");
 
@@ -300,6 +188,15 @@ function createNode(node) {
   return div;
 }
 
+// 渲染
+function render() {
+  const app = document.getElementById("app");
+  if (!data.length) return;
+
+  app.innerHTML = "";
+  data.forEach(d => app.appendChild(createNode(d)));
+}
+
 // 左侧导航
 function renderSidebar() {
   const sb = document.getElementById("sidebar");
@@ -310,26 +207,31 @@ function renderSidebar() {
     item.innerText = d.category;
 
     item.onclick = () => {
-      document.getElementById("app").innerHTML = "";
-      document.getElementById("app").appendChild(createNode(d));
+      const app = document.getElementById("app");
+      app.innerHTML = "";
+      app.appendChild(createNode(d));
     };
 
     sb.appendChild(item);
   });
 }
 
-// 主渲染
-function render() {
-  const app = document.getElementById("app");
-  app.innerHTML = "";
-
-  data.forEach(d => {
-    app.appendChild(createNode(d));
+// 🔥 数据加载（关键）
+fetch("./data.json")
+  .then(res => {
+    if (!res.ok) throw new Error("加载失败");
+    return res.json();
+  })
+  .then(json => {
+    data = json;
+    renderSidebar();
+    render();
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById("app").innerHTML =
+      "<p style='color:red'>data.json加载失败</p>";
   });
-}
-
-renderSidebar();
-render();
 
 </script>
 
