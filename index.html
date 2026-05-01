@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>资源导航系统</title>
+  <title>资源树状导航系统</title>
 
   <style>
     body {
@@ -16,47 +16,43 @@
       text-align: center;
     }
 
-    .nav {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-      justify-content: center;
-    }
-
-    .btn {
-      padding: 8px 12px;
-      border: 1px solid #333;
-      cursor: pointer;
-      border-radius: 6px;
-      background: white;
-    }
-
-    .btn.active {
-      background: black;
-      color: white;
-    }
-
-    .subnav {
-      margin: 10px 0 20px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .subbtn {
-      padding: 6px 10px;
-      border: 1px solid #888;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .card {
-      border: 1px solid #ddd;
+    input {
+      width: 100%;
       padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .category {
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px 0;
+      font-size: 18px;
+    }
+
+    .subcategory {
+      margin-left: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .items {
+      margin-left: 40px;
+      display: none;
+    }
+
+    .item {
+      margin: 5px 0;
+    }
+
+    a {
+      text-decoration: none;
+      color: #1a73e8;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
 
     .tag {
@@ -64,32 +60,23 @@
       background: #333;
       color: white;
       padding: 2px 6px;
-      margin-right: 5px;
       border-radius: 4px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
+      margin-left: 5px;
     }
   </style>
 </head>
 
 <body>
 
-<h1>📚 资源导航系统</h1>
+<h1>📚 资源树状导航系统</h1>
 
 <input id="search" placeholder="搜索资源..." oninput="render()" />
 
-<div class="nav" id="nav"></div>
-<div class="subnav" id="subnav"></div>
-<div id="results"></div>
+<div id="app"></div>
 
 <script>
 
 const data = [
-
   {
     category: "百科索引",
     children: [
@@ -136,7 +123,7 @@ const data = [
         items: [
           { name: "万方新方志", url: "https://fz.wanfangdata.com.cn/", tags: ["档案"] },
           { name: "全国报刊索引", url: "https://www.cnbksy.cn/", tags: ["报刊"] },
-          { name: "中华数字书苑", url: "https://www.apabi.com/hndx?cult=CN&username=%E6%9D%A5%E8%87%AA%20%E6%B2%B3%E5%8D%97%E5%A4%A7%E5%AD%A6%20%E7%9A%84%E7%94%A8%E6%88%B7&ug=%E6%B2%B3%E5%8D%97%E5%A4%A7%E5%AD%A6%E6%97%A0%E5%AF%86%E7%A0%81%E7%94%A8%E6%88%B7%E7%BB%84", tags: ["档案"] }
+          { name: "中华数字书苑", url: "https://www.apabi.com/hndx?cult=CN", tags: ["档案"] }
         ]
       },
 
@@ -161,7 +148,6 @@ const data = [
               { name: "HathiTrust数字图书馆", url: "https://www.hathitrust.org/", tags: ["图书"] },
               { name: "公民教育资源", url: "https://new.academy4sc.org/", tags: ["教育"] }
             ],
-
             children: [
               {
                 subcategory: "人物",
@@ -223,41 +209,82 @@ const data = [
       }
     ]
   }
-
 ];
 
-// 渲染资源
+// 搜索关键词
+function getSearch() {
+  return document.getElementById("search").value.toLowerCase();
+}
+
+// 渲染整个树
 function render() {
-  const keyword = document.getElementById("search").value.toLowerCase();
-  const results = document.getElementById("results");
-  results.innerHTML = "";
+  const app = document.getElementById("app");
+  app.innerHTML = "";
 
-  let items = currentSub.items;
+  const key = getSearch();
 
-  if (keyword) {
-    items = items.filter(i =>
-      i.name.toLowerCase().includes(keyword) ||
-      i.tags.join("").toLowerCase().includes(keyword)
-    );
-  }
+  data.forEach(cat => {
+    const catDiv = document.createElement("div");
 
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "card";
+    const catTitle = document.createElement("div");
+    catTitle.className = "category";
+    catTitle.innerText = "📁 " + cat.category;
 
-    div.innerHTML = `
-      <a href="${item.url}" target="_blank">
-        <h3>${item.name}</h3>
-      </a>
-      ${item.tags.map(t => `<span class="tag">${t}</span>`).join("")}
-    `;
+    const catContent = document.createElement("div");
+    catContent.style.display = "none";
 
-    results.appendChild(div);
+    catTitle.onclick = () => {
+      catContent.style.display =
+        catContent.style.display === "none" ? "block" : "none";
+    };
+
+    cat.children.forEach(sub => {
+      const subDiv = document.createElement("div");
+
+      const subTitle = document.createElement("div");
+      subTitle.className = "subcategory";
+      subTitle.innerText = "📂 " + sub.subcategory;
+
+      const itemBox = document.createElement("div");
+      itemBox.className = "items";
+
+      subTitle.onclick = () => {
+        itemBox.style.display =
+          itemBox.style.display === "none" ? "block" : "none";
+      };
+
+      let items = sub.items || [];
+
+      if (key) {
+        items = items.filter(i =>
+          i.name.toLowerCase().includes(key) ||
+          i.tags.join("").toLowerCase().includes(key)
+        );
+      }
+
+      items.forEach(i => {
+        const item = document.createElement("div");
+        item.className = "item";
+
+        item.innerHTML = `
+          🔗 <a href="${i.url}" target="_blank">${i.name}</a>
+          ${i.tags.map(t => `<span class="tag">${t}</span>`).join("")}
+        `;
+
+        itemBox.appendChild(item);
+      });
+
+      subDiv.appendChild(subTitle);
+      subDiv.appendChild(itemBox);
+      catContent.appendChild(subDiv);
+    });
+
+    catDiv.appendChild(catTitle);
+    catDiv.appendChild(catContent);
+    app.appendChild(catDiv);
   });
 }
 
-renderNav();
-renderSub();
 render();
 
 </script>
