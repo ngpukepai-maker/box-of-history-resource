@@ -107,12 +107,23 @@ mark {
 let data = [];
 
 // 从 data.json 自动加载
-fetch("data.json")
-  .then(res => res.json())
+fetch("./data.json")
+  .then(res => {
+    if (!res.ok) {
+      throw new Error("data.json加载失败，状态码：" + res.status);
+    }
+    return res.json();
+  })
   .then(json => {
+    console.log("数据加载成功", json);
     data = json;
     renderSidebar();
     render();
+  })
+  .catch(err => {
+    console.error("加载错误：", err);
+    document.getElementById("app").innerHTML =
+      "<p style='color:red'>数据加载失败，请检查 data.json 路径</p>";
   });
 
 // 搜索
