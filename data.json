@@ -1,39 +1,134 @@
 [
   {
-    "category": "百科索引",
-    "children": [
+    category: "百科索引",
+    children: [
       {
-        "subcategory": "百科网站",
-        "items": [
-          { "name": "大英百科全书", "url": "https://www.britannica.com/", "tags": ["百科"] },
-          { "name": "Wikipedia", "url": "https://www.wikipedia.org/", "tags": ["百科"] },
-          { "name": "Google Scholar", "url": "https://scholar.google.com", "tags": ["学术"] }
+        subcategory: "百科网站",
+        items: [
+          { name: "大英百科全书", url: "https://www.britannica.com/", tags: ["百科"] },
+          { name: "Wikipedia", url: "https://www.wikipedia.org/", tags: ["百科"] },
+          { name: "Google Scholar", url: "https://scholar.google.com", tags: ["学术"] }
         ]
       }
     ]
   },
 
   {
-    "category": "论文期刊资源",
-    "children": [
+    category: "论文期刊资源",
+    children: [
       {
-        "subcategory": "中文",
-        "items": [
-          { "name": "中国知网", "url": "https://www.cnki.net/", "tags": ["论文"] },
-          { "name": "万方数据库", "url": "https://www.wanfangdata.com.cn/", "tags": ["论文"] }
+        subcategory: "中文",
+        items: [
+          { name: "中国知网", url: "https://www.cnki.net/", tags: ["论文"] },
+          { name: "万方数据库", url: "https://www.wanfangdata.com.cn/", tags: ["论文"] }
         ]
       },
       {
-        "subcategory": "英文",
-        "items": [
-          { "name": "JSTOR", "url": "https://www.jstor.org/", "tags": ["论文"] },
-          { "name": "Project MUSE", "url": "https://muse.jhu.edu/", "tags": ["论文"] },
-          { "name": "Sci-Hub", "url": "https://sci-hub.box/", "tags": ["论文"] },
-          { "name": "Oxford Academic", "url": "https://academic.oup.com/", "tags": ["论文"] },
-          { "name": "SAGE Journals", "url": "https://www.sagepub.com/disciplines", "tags": ["论文"] },
-          { "name": "Wiley Online Library", "url": "https://onlinelibrary.wiley.com/", "tags": ["论文"] }
+        subcategory: "英文",
+        items: [
+          { name: "JSTOR", url: "https://www.jstor.org/", tags: ["论文"] },
+          { name: "Project MUSE", url: "https://muse.jhu.edu/", tags: ["论文"] },
+          { name: "Sci-Hub", url: "https://sci-hub.box/", tags: ["论文"] },
+          { name: "Oxford Academic", url: "https://academic.oup.com/", tags: ["论文"] },
+          { name: "SAGE Journals", url: "https://www.sagepub.com/disciplines", tags: ["论文"] },
+          { name: "Wiley Online Library", url: "https://onlinelibrary.wiley.com/", tags: ["论文"] }
+        ]
+      }
+    ]
+  },
+
+  {
+    category: "档案资料",
+    children: [
+      {
+        subcategory: "中文",
+        items: [
+          { name: "万方新方志", url: "https://fz.wanfangdata.com.cn/", tags: ["档案"] },
+          { name: "全国报刊索引", url: "https://www.cnbksy.cn/", tags: ["报刊"] },
+          { name: "中华数字书苑", url: "https://www.apabi.com/hndx?cult=CN", tags: ["档案"] }
+        ]
+      },
+
+      {
+        subcategory: "外文",
+        children: [
+          {
+            subcategory: "美国",
+            items: [
+              { name: "美国国会传记名录", url: "https://bioguide.congress.gov/", tags: ["档案"] },
+              { name: "美国国家历史", url: "https://www.history.com/", tags: ["历史"] },
+              { name: "美国国家档案馆", url: "https://www.archives.gov/", tags: ["档案"] },
+              { name: "美国国家公园管理局", url: "https://www.nps.gov/index.htm", tags: ["档案"] },
+              { name: "美国众议院历史档案", url: "https://history.house.gov/", tags: ["档案"] },
+              { name: "美国国家妇女史博物馆", url: "https://www.womenshistory.org/", tags: ["女性史"] },
+              { name: "美国妇女选举权史", url: "https://www.crusadeforthevote.org/", tags: ["女性史"] },
+              { name: "Alexander Street Women History", url: "https://documents.alexanderstreet.com/womhist", tags: ["档案"] },
+              { name: "Bill of Rights Institute", url: "https://billofrightsinstitute.org/", tags: ["法律"] },
+              { name: "美国国会图书馆", url: "https://catalog.loc.gov/", tags: ["档案"] },
+              { name: "美国宪法注释", url: "https://constitution.congress.gov/", tags: ["法律"] },
+              { name: "Famous Trials", url: "https://famous-trials.com/", tags: ["案件"] },
+              { name: "HathiTrust数字图书馆", url: "https://www.hathitrust.org/", tags: ["图书"] },
+              { name: "公民教育资源", url: "https://new.academy4sc.org/", tags: ["教育"] }
+            ],
+            children: [
+              {
+                subcategory: "人物",
+                items: [
+                  { name: "苏珊·安东尼资料馆", url: "https://susananthony.weebly.com/", tags: ["人物"] }
+                ]
+              }
+            ]
+          },
+
+          {
+            subcategory: "英国",
+            items: [
+              { name: "英国国家档案馆", url: "https://www.nationalarchives.gov.uk/", tags: ["档案"] },
+              { name: "英国公报", url: "https://www.thegazette.co.uk/", tags: ["官方"] }
+            ]
+          },
+
+          {
+            subcategory: "汇总类",
+            items: [
+              { name: "互联网档案馆", url: "https://archive.org/", tags: ["档案"] },
+              { name: "在线报纸档案库", url: "https://www.newspapers.com/", tags: ["报刊"] },
+              { name: "Fordham历史资料库", url: "https://sourcebooks.fordham.edu/", tags: ["历史"] },
+              { name: "布鲁克林图书馆", url: "https://www.bklynlibrary.org/", tags: ["图书"] },
+              { name: "HeinOnline法律馆藏", url: "https://home.heinonline.org/", tags: ["法律"] },
+              { name: "欧洲图书馆", url: "https://www.theeuropeanlibrary.org/", tags: ["图书"] }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    category: "智能工具",
+    children: [
+      {
+        subcategory: "词典翻译",
+        items: [
+          { name: "在线词源词典", url: "https://www.etymonline.com/", tags: ["词典"] }
+        ]
+      },
+
+      {
+        subcategory: "书籍与文本处理",
+        items: [
+          { name: "Owleyes阅读注释", url: "https://www.owleyes.org/", tags: ["阅读"] },
+          { name: "IPL写作中心", url: "https://www.ipl.org/", tags: ["写作"] },
+          { name: "WorldCat书籍库", url: "https://search.worldcat.org/zh-cn", tags: ["图书"] }
+        ]
+      },
+
+      {
+        subcategory: "小工具站",
+        items: [
+          { name: "The Absolute Truth", url: "https://www.theabsolute.net/", tags: ["哲学"] }
         ]
       }
     ]
   }
-]
+];
