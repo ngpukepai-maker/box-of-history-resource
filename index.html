@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>我的资源网站</title>
+</head>
+<body>
+
+<h1>📚 我的资源网站</h1>
+
+<input id="search" placeholder="输入关键词" />
+<button onclick="search()">搜索</button>
+
+<ul id="results"></ul>
+
+<script>
+const data = [
+  {
+    name: "Google Scholar",
+    url: "https://scholar.google.com",
+    tags: ["论文", "学术"]
+  },
+  {
+    name: "Internet Archive",
+    url: "https://archive.org",
+    tags: ["书籍", "资源"]
+  }
+];
+
+function search() {
+  const keyword = document.getElementById("search").value;
+  const results = document.getElementById("results");
+  results.innerHTML = "";
+
+  data
+    .filter(item =>
+      item.name.includes(keyword) ||
+      item.tags.join("").includes(keyword)
+    )
+    .forEach(item => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="${item.url}" target="_blank">${item.name}</a>`;
+      results.appendChild(li);
+    });
+}
+</script>
+
+</body>
+</html>
