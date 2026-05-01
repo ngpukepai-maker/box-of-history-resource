@@ -251,10 +251,31 @@ function createNode(node) {
 
   // children（递归）
   if (node.children) {
-    node.children.forEach(child => {
-      content.appendChild(createNode(child));
-    });
-  }
+  node.children.forEach(child => {
+
+    const wrapper = document.createElement("div");
+
+    const childTitle = document.createElement("div");
+    childTitle.className = "title";
+    childTitle.innerText = "📂 " + (child.subcategory || child.category);
+
+    const childContent = document.createElement("div");
+    childContent.style.display = "none";
+
+    childTitle.onclick = () => {
+      childContent.style.display =
+        childContent.style.display === "none" ? "block" : "none";
+    };
+
+    // 递归继续渲染
+    childContent.appendChild(createNode(child));
+
+    wrapper.appendChild(childTitle);
+    wrapper.appendChild(childContent);
+
+    content.appendChild(wrapper);
+  });
+}
 
   container.appendChild(title);
   container.appendChild(content);
